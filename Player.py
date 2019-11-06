@@ -16,7 +16,8 @@ class Player:
             return False
 
     def target(Enemy):
-    
+        target_name = Enemy.name
+        target_num = 
     def print_inventory(self):
         for item in self.inventory:
             print(item, '\n')
