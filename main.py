@@ -4,11 +4,11 @@ from enemies import Moblin
 def play():
     link = Player("Zelda", 6)
     mob1 = Moblin(1)
-    dmg, output = mob1.attack(link)
+    output = mob1.attack(link)
     print(output)
     print(link.hp)
     link.target(mob1)
-    dmg, output = mob1.attack(link)
+    output = mob1.attack(link)
     print(output)
     print(link.hp)
     
