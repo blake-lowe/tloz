@@ -4,7 +4,7 @@ class Object:
         self.description = description
         self.isMovable = isMovable
         self.isMoved = isMoved
-    def description():
+    def description(self):
         print(description)
 
 
