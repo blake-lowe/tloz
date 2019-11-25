@@ -6,15 +6,19 @@ import tkinter as tk
 import tkinter.scrolledtext as ScrolledText
 
 #list of commands
-#go(move player)
-#attack(sword attack on engaged enemy)
-#use
-#shoot(use bow)
-#equip(equip item and auto unequip the one in the slot)
-#look(print description of room again)
-#examine(give description of object or item)
-#pick up/get/grab/take
-#inventory
+#go(move player) ex. go north, go n, n, s, e, w, u, d
+#engage/approach (move toward enemy) ex. engage moblin 1, eng moblin 1, approach moblin 1, app moblin 1
+#disengage/run (move away from enemy) ex. disengage moblin 1, dis moblin 1, run from moblin 1, run moblin 1
+#attack(sword attack on engaged enemy) ex. attack moblin 1, atk moblin 1
+#use ex. use life potion
+#shoot(use bow) ex. shoot moblin 1
+#equip(equip item and auto unequip the one in the slot) ex. equip bow, equip bomb
+#look(print description of room again) ex. look
+#examine(give description of object or item) ex. examine bow, 
+#take ex. take bow, take rupy
+#inventory ex. inventory, i
+
+#connector words: from, on, at, around
 
 def play():
     return
