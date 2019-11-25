@@ -15,13 +15,15 @@ class MapTile:
         self.items = items
         self.objects = objects
     def intro_text(self):
-        print(self.description)
+        outputLines = ""
+        outputLines += self.description + "\n"
         for exit in self.exitsDescriptions:
             if exit:
-                print(exit)
+                outputLines += exit + "\n"
         for i in range(0, 6):
             if self.hiddenExitRevealed[i]:
-                print(self.hiddenExitsDescriptions[i])
+                outputLines += self.hiddenExitsDescriptions[i] + "\n"
+        return outputLines
     #def modify_player(self, player):
         #return
 

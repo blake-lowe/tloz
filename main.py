@@ -23,31 +23,46 @@ def play():
     currentTile.intro_text()
     '''
 
-async def userInput():
-    while True:
-        x = input(">")
+def msgLog(text):
+    msgBox.config(state=tk.NORMAL)
+    msgBox.insert(tk.END, text)
+    msgBox.config(state=tk.DISABLED)
+    lo = msgBox.vbar.get()[0]
+    hi = msgBox.vbar.get()[1]
+    barSize = hi-lo
+    print(barSize)
+    #msgBox.vbar.set(1.0-barSize, 1.0)
+    msgBox.yview_moveto(hi)
+    msgBox.vbar.update()
+    print(msgBox.vbar.get())
 
-async def enemyActions():
-    while True:
-        await asyncio.sleep(1)
-        print("oof")
+def key(event):
+    #print("pressed return")
+    parseInput(inputBox.get())
+    inputBox.delete(0, 'end')
+
+def parseInput(userInput):
+    #print(userInput)
+    msgLog(userInput+"\n")
+
 
 if __name__ == "__main__":
-    #play()
-    #asyncio.run(enemyActions())
-    #asyncio.run(userInput())
     root = tk.Tk()
     root.resizable(False, False)
     canvas1 = tk.Canvas(root)
+    
     root.geometry("1000x500")
-
+    root.title("The Legend of Zelda")
+    root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='icon.png'))
     inputBox = tk.Entry(root)
     inputBox.pack()
     inputBox.place(bordermode=tk.OUTSIDE, height=20, width=1000, y = 480)
+    inputBox.bind("<Return>", key)
     msgBox = ScrolledText.ScrolledText(root)
     msgBox.pack()
     msgBox.place(bordermode=tk.OUTSIDE, height=480, width=1000, y = 0)
-    msgBox.config(state=tk.DISABLED)#to add a line first set state to normal then add line then disable state again
-
+    msgBox.config(state=tk.DISABLED)
+    #play()
+    
     tk.mainloop()
     
