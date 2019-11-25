@@ -15,18 +15,19 @@ class MapTile:
         self.items = items
         self.objects = objects
     def intro_text(self):
-        print(description)
-        for exit in exitsDescriptions:
+        print(self.description)
+        for exit in self.exitsDescriptions:
             if exit:
                 print(exit)
         for i in range(0, 6):
-            if hiddenExitRevealed(i):
-                print(hiddenExitsDescriptions(i))
+            if self.hiddenExitRevealed[i]:
+                print(self.hiddenExitsDescriptions[i])
     #def modify_player(self, player):
         #return
 
 def getOverworldTiles():
-    tileList = [2][2][2]
+    w, d, h = 2, 2, 2
+    tileList = [[[None for x in range(w)] for y in range(h)] for z in range(d)]
     tileList[0][0][1] = MapTile(
         Point(0,0,1),
         "You find yourself in a clearing in the forest.",
@@ -44,6 +45,3 @@ def getOverworldTiles():
 def getLvl1Tiles():
     tileList = [6][6]
     return tileList
-
-
-    
