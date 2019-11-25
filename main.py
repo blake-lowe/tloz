@@ -40,8 +40,6 @@ if __name__ == "__main__":
     root.resizable(False, False)
     canvas1 = tk.Canvas(root)
     root.geometry("1000x500")
-    #canvas1.pack_propagate(0)
-    #canvas1.pack()
 
     inputBox = tk.Entry(root)
     inputBox.pack()
@@ -49,6 +47,7 @@ if __name__ == "__main__":
     msgBox = ScrolledText.ScrolledText(root)
     msgBox.pack()
     msgBox.place(bordermode=tk.OUTSIDE, height=480, width=1000, y = 0)
-    
+    msgBox.config(state=tk.DISABLED)#to add a line first set state to normal then add line then disable state again
+
     tk.mainloop()
     
