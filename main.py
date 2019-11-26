@@ -39,10 +39,36 @@ def escape(event):
     inputBox.delete(0, 'end')
 
 def parseInput(userInput):
-    #print(userInput)
+    userInput = userInput.lower()
+    #remove prepositions
+    removeWords = ["from", "on", "at", "around"]
     inputWords = userInput.split()
+    for word in inputWords:
+        if word in removeWords:
+            inputWords.remove(word)
+    #assign words to variables
+    try:
+        actionWord = inputWords[0]
+    except:
+        actionWord = None
+    try:
+        objectWord = inputWords[1]
+    except:
+        objectWord = None
+    try:
+        targetWord = inputWords[2]
+    except:
+        targetWord = None
 
-    msgLog(userInput+"\n")
+    #switch to correct command
+    if actionWord in ["go"]:
+        return
+        #move player based on ojbectWord
+    elif actionWord in ["engage"]:
+        return
+
+
+    #msgLog(userInput+"\n")
 
 
 if __name__ == "__main__":
