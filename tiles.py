@@ -24,8 +24,10 @@ class MapTile:
             if self.hiddenExitRevealed[i]:
                 outputLines += self.hiddenExitsDescriptions[i] + "\n"
         return outputLines
-    #def modify_player(self, player):
-        #return
+    def enemySearch(self, name, num):
+        for enemy in enemies:
+            if enemy.name == name and enemy.num == num:
+                return enemy
 
 def getOverworldTiles():
     w, d, h = 2, 2, 2

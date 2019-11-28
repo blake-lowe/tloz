@@ -42,8 +42,14 @@ def key(event):
 def escape(event):
     inputBox.delete(0, 'end')
 
-def parseInput(userInput):
-    userInput = userInput.lower()
+def parseInput(link, userInputz, currentRoom):
+    itemDescriptions = {
+        "wooden shield":"A simple round shield with a cross emblazoned on it.",
+        "sword":"A simple weapon with a wooden blade and a green and gold handle.",
+        "white sword":"A metal sword with a blueish crossguard and handle.",
+        "magical sword":"A razor-sharp blade gleaming with a luster pure enough to seal away the darkness."
+    }
+    userInput = userInputz.lower()
     #remove prepositions
     removeWords = ["from", "on", "at", "around"]
     inputWords = userInput.split()
@@ -67,9 +73,37 @@ def parseInput(userInput):
     #switch to correct command
     if actionWord in ["go"]:
         return
-        #move player based on ojbectWord
-    elif actionWord in ["engage"]:
-        return
+        #move player based on ojbectWord TODO###########
+    elif actionWord in ["engage", "eng", "approach", "app"]:
+        try:
+            #if enemy is in enemies list
+            link.engage(objectWord, targetWord)
+            msgLog(f"Engaged {objectWord} {targetWord}.")
+            #else return that enemy is not present
+        except:
+            msgLog("##Input eror##")
+    elif actionWord in ["disengage", "dis", "run"]:
+        link.engage("", "")
+        msgLog("Disengaged from all enemies.")
+    elif actionWord in ["attack"]:
+        enemy = currentRoom.enemySearch(objectWord, targetWord)
+        msgLog(link.attack(enemy))
+    elif actionWord in ["look"]:
+        msgLog(currentRoom.intro_text())
+        if objectWord:
+            msgLog("Use examine to get a description of an object.")
+    elif actionWord in ["examine"]:
+        try:
+            msgLog(itemDescriptions[objectWord])
+        except:
+            msgLog("{objectWord} is not in your inventory.")
+        
+
+    elif actionWord in ["xyzzy"]:
+        link.inventory.append(objectWord)
+        msgLog(f"{objectWord} added to inventory.")
+    else:
+        msgLog("##Command not recognised##")
 
 
     msgLog(userInput+"\n")
@@ -133,9 +167,11 @@ if __name__ == "__main__":
     msgBox.pack()
     msgBox.place(bordermode=tk.OUTSIDE, height=480, width=1000, y = 0)
     msgBox.config(state=tk.DISABLED)
-    #play()
     
     tk.mainloop()
 
     link = Player(playerName, 3)
     
+    isPlaying = True
+    while isPlaying:
+        print("hey")

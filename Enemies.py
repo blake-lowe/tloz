@@ -1,8 +1,13 @@
+import random
+import time
+
 class Enemy:
-    def __init__(self, num, name, hp):
+    def __init__(self, num, name, hp, actionSpeed):
         self.name = name
         self.num = num
         self.hp = hp
+        self.actionSpeed = actionSpeed
+        self.r = random.seed(time.time())
 
     def is_alive(self):
         return self.hp > 0
@@ -15,12 +20,17 @@ class Enemy:
 
 class Moblin(Enemy):
     def __init__(self, num):
-        super().__init__(num, name="Moblin", hp = 2)
+        super().__init__(self, num, name="Moblin", hp = 2, actionSpeed = 1)
 
     def attack(self, player):
-        if(player.is_targeting(self)):
-            return f"Moblin {self.num} throws a spear at you! Your shield blocks it."
-        else:
-            player.hp-=0.5
-            return f"Moblin {self.num} throws a spear at you! You lose 0.5 hearts."
+        accuracy = 50#percent chance of throwing spear on target
+        i = self.r.randint(0, 100)
+        if i < accuracy:
+            if(player.is_engaged(self)):
+                return f"Moblin {self.num} throws a spear at you! Your shield blocks it."
+            else:
+                player.hp-=0.5
+                return f"Moblin {self.num} throws a spear at you! You lose 0.5 hearts."
+        elif i > accuracy:
+            return f"Moblin {self.num} throws a spear at you! It misses."
         
