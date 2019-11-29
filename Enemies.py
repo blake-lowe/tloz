@@ -8,6 +8,7 @@ class Enemy:
         self.hp = hp
         self.actionSpeed = actionSpeed
         self.r = random.seed(time.time())
+        self.nextActionTime = actionSpeed*r.random()
 
     def is_alive(self):
         return self.hp > 0

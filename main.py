@@ -3,6 +3,7 @@ from enemies import Moblin
 import tiles
 import asyncio
 import tkinter as tk
+import time
 import tkinter.scrolledtext as ScrolledText
 from winsound import PlaySound, SND_FILENAME, SND_LOOP, SND_ASYNC
 from colorama import Fore, Back, Style
@@ -154,6 +155,8 @@ if __name__ == "__main__":
     playerName = input("REGISTER YOUR NAME\n")
     PlaySound(None, SND_FILENAME)
     
+    PlaySound('audio/Overworld.wav', SND_FILENAME)
+    PlaySound('audio/OverworldLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
     #open window
     root = tk.Tk()
     root.resizable(False, False)
@@ -176,9 +179,12 @@ if __name__ == "__main__":
     tk.mainloop()
 
     link = Player(playerName, 3)
-    
-    PlaySound('audio/GameOver.wav', SND_FILENAME)
-    PlaySound('audio/GameOverLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
+    map = tiles.getOverworldTiles()
+    currentTile = map[0][0][1]
+    link.inventory.append("wooden sword")
+
     isPlaying = True
     while isPlaying:
-        print("hey")
+        msgLog(currentTile.intro_text())
+        for enemy in currentTile.enemies:
+            enemy.nextActionTime+=time.time()
