@@ -1,5 +1,4 @@
 from point import Point
-import items
 import enemies
 
 class MapTile:
@@ -28,6 +27,7 @@ class MapTile:
         for enemy in enemies:
             if enemy.name == name and enemy.num == num:
                 return enemy
+        return None
 
 def getOverworldTiles():
     w, d, h = 2, 2, 2

@@ -76,10 +76,12 @@ def parseInput(link, userInputz, currentRoom):
         #move player based on ojbectWord TODO###########
     elif actionWord in ["engage", "eng", "approach", "app"]:
         try:
-            #if enemy is in enemies list
-            link.engage(objectWord, targetWord)
-            msgLog(f"Engaged {objectWord} {targetWord}.")
-            #else return that enemy is not present
+            enemy = currentRoom.enemySearch(objectWord, targetWord)
+            if enemy:
+                link.engage(enemy)
+                msgLog(f"Engaged {objectWord} {targetWord}.")
+            else:
+                msgLog(f"#{objectWord} {targetWord} is not present#")
         except:
             msgLog("##Input eror##")
     elif actionWord in ["disengage", "dis", "run"]:
@@ -87,7 +89,10 @@ def parseInput(link, userInputz, currentRoom):
         msgLog("Disengaged from all enemies.")
     elif actionWord in ["attack"]:
         enemy = currentRoom.enemySearch(objectWord, targetWord)
-        msgLog(link.attack(enemy))
+        if enemy:
+            msgLog(link.attack(enemy))
+        else:
+            msgLog(f"#{objectWord} {targetWord} is not present#")
     elif actionWord in ["look"]:
         msgLog(currentRoom.intro_text())
         if objectWord:
@@ -96,7 +101,7 @@ def parseInput(link, userInputz, currentRoom):
         try:
             msgLog(itemDescriptions[objectWord])
         except:
-            msgLog("{objectWord} is not in your inventory.")
+            msgLog("#{objectWord} is not in your inventory#")
         
 
     elif actionWord in ["xyzzy"]:
@@ -172,6 +177,8 @@ if __name__ == "__main__":
 
     link = Player(playerName, 3)
     
+    PlaySound('audio/GameOver.wav', SND_FILENAME)
+    PlaySound('audio/GameOverLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
     isPlaying = True
     while isPlaying:
         print("hey")
