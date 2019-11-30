@@ -1,5 +1,5 @@
 from point import Point
-import enemies
+from enemies import Moblin
 
 class MapTile:
     def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemiez, items, objects):
@@ -51,9 +51,9 @@ def getOverworldTiles():
         Point(0,0,1),#this tile position
         "You find yourself in a clearing in the forest.",#tile description
         [Point(0,1,1), None, None, None, None, None],#exits
-        ["A path through the trees leads to the north.", None, None, None, None, None],#exit descriptions
+        ["A path through the trees leads to the NORTH.", None, None, None, None, None],#exit descriptions
         [None, None, None, None, None, Point(0,0,0)],#hidden exits
-        [None, None, None, None, None, "A cave entrance is cut into the hill leading down."],#hidden exit descriptions
+        [None, None, None, None, None, "A cave entrance is cut into the hill leading DOWN."],#hidden exit descriptions
         [False, False, False, False, False, True],#is the hidden exit revealed
         [],#enemies
         [],#items
@@ -64,7 +64,7 @@ def getOverworldTiles():
         Point(0,0,0),#this tile position
         "You are in a cave lit by two flames suspended in midair. In between, stands an old man in red robes. He offers you the \nhilt of a sword saying, \"It's dangerous to go alone! Take this.\"",#tile description
         [None, None, None, None, Point(0,0,1), None],#exits
-        [None, None, None, None, "The cave's exit is back up the way you came.", None],#exit descriptions
+        [None, None, None, None, "The cave's exit is back UP the way you came.", None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, None],#is the hidden exit revealed
@@ -72,8 +72,39 @@ def getOverworldTiles():
         ["sword"],#items
         []#objects
         )
+    #moblin room (beach)
+    tileList[0][1][1] = MapTile(
+        Point(0,1,1),#this tile position
+        "You come to a bridge leading NORTH to a small island",#tile description
+        [None, None, Point(0,0,1), None, None, None],#exits
+        [None, None, "A path leads SOUTH to a clearing in the forest.", None, None, None],#exit descriptions
+        [None, None, None, None, None, None],#hidden exits
+        [None, None, None, None, None, None],#hidden exit descriptions
+        [False, False, False, False, False, False],#is the hidden exit revealed
+        [Moblin("1"), Moblin("2")],#enemies
+        [],#items
+        []#objects
+        )
+    #spider room
+    #zelda room (here's all 8 units of the triforce of wisdom. Ganon lays dead on the ground)
     return tileList
 
 def getLvl1Tiles():
     tileList = [6][6]
     return tileList
+
+#template for new tiles
+'''
+    tileList[x][x][x] = MapTile(
+        Point(x,x,x),#this tile position
+        "",#tile description
+        [None, None, None, None, None, None],#exits
+        [None, None, None, None, None, None],#exit descriptions
+        [None, None, None, None, None, None],#hidden exits
+        [None, None, None, None, None, None],#hidden exit descriptions
+        [False, False, False, False, False, False],#is the hidden exit revealed
+        [],#enemies
+        [],#items
+        []#objects
+        )
+'''

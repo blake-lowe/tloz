@@ -20,13 +20,13 @@ class Player:
         self.target_num = Enemy.num
         
     def attack(self, Enemy):
-        if "magical sword" in inventory:
+        if "magical sword" in self.inventory:
             Enemy.hp -= 4
             return f"Your magical sword deals 4 damage to {Enemy.name} {Enemy.num}"
-        elif "white sword" in inventory:
+        elif "white sword" in self.inventory:
             Enemy.hp -= 2
             return f"Your whte sword deals 2 damage to {Enemy.name} {Enemy.num}"
-        elif "sword" in inventory:
+        elif "sword" in self.inventory:
             Enemy.hp -= 1
             return f"Your sword deals 1 damage to {Enemy.name} {Enemy.num}"
         else:

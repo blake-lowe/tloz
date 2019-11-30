@@ -2,7 +2,7 @@ from player import Player
 from enemies import Moblin
 import tiles
 from point import Point
-import asyncio
+import random
 import tkinter as tk
 import time
 import tkinter.scrolledtext as ScrolledText
@@ -36,6 +36,7 @@ global currentTime
 global isIntroFinished
 global isLinkDead
 
+#log messages to the ouput window
 def msgLog(text):
     msgBox.config(state=tk.NORMAL)#make text box editable
     msgBox.insert(tk.END, text)#add text to box
@@ -47,13 +48,16 @@ def msgLog(text):
     msgBox.yview_moveto(hi)
     msgBox.vbar.update()
 
-def key(event):#when the enter key is pressed
+#triggered when the enter key is pressed
+def key(event):
     parseInput(inputBox.get())#pass input to function below
     inputBox.delete(0, 'end')
 
+#triggered when the escape key is pressed
 def escape(event):
     inputBox.delete(0, 'end')
 
+## handle commands input to entry box ##
 def parseInput(userInputz):
     global isLinkDead
     msgLog(">"+userInputz)
@@ -113,12 +117,12 @@ def parseInput(userInputz):
         if currentTile.exitsPos[direction]:
             newPos = currentTile.exitsPos[direction]
             currentTile = map[newPos.x][newPos.y][newPos.z]
-            msgLog(currentTile.intro_text())
+            initTile()
         else:
             if currentTile.hiddenExitsPos[direction] and currentTile.hiddenExitRevealed[direction]:
                 newPos = currentTile.hiddenExitsPos[direction]
                 currentTile = map[newPos.x][newPos.y][newPos.z]
-                msgLog(currentTile.intro_text())
+                initTile()
             else:
                 msgLog("# You can't go that way. #")
     #engage
@@ -147,13 +151,19 @@ def parseInput(userInputz):
         enemy = currentTile.enemySearch(objectWord, targetWord)
         if enemy:
             msgLog(link.attack(enemy))
+            msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
+            if enemy.hp <= 0:
+                msgLog(f"{objectWord} {targetWord} is dead.")
+                currentTile.enemiez.remove(enemy)
         else:
-            if objectWord in ["old"] and currentTile.pos == Point(0,0,0):
+            if objectWord in ["old"] and currentTile.pos.x == 0 and currentTile.pos.y == 0 and currentTile.pos.z == 0:
                 msgLog("# You can't attack an NPC. #")
             else:
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
+
+        ##TODO check if engaged with enemy and do sword beams
     #take
-    elif actionWord in ["take"]:
+    elif actionWord in ["take", "get"]:
         item = ""
         if targetWord:
             item = objectWord + ' ' + targetWord
@@ -218,6 +228,7 @@ def parseInput(userInputz):
     else:
         msgLog("## Command not recognised. ##")
 
+#display game over message and change music
 def endGame():
     inputBox.delete(0, 'end')
     msgLog("===============")
@@ -226,22 +237,45 @@ def endGame():
     PlaySound(None, SND_FILENAME)
     PlaySound('audio/GameOver.wav', SND_FILENAME)
 
+#get a tile ready for player entry
+def initTile():
+    msgLog(currentTile.intro_text())
+    for enemy in currentTile.enemiez:
+        print(enemy.nextActionTime)
+        enemy.nextActionTime = currentTime + random.random()*enemy.actionSpeed
+        print(enemy.nextActionTime)
+    return
 
-
+## This loop is repeatedly called with tkinter libraries to allow game logic to occur ##
 def gameloop():
+    global isLinkDead
+    #update time
     global currentTime
     global isIntroFinished
     currentTime = time.time()-startTime
-    #msgLog(currentTime)
     
-
+    #let enemies do actions
+    if not isLinkDead:
+        for enemy in currentTile.enemiez:
+            if currentTime > enemy.nextActionTime:
+                msgLog(enemy.action(link))
+                enemy.nextActionTime += enemy.actionSpeed
+    
+    #check for player death
+        if link.hp <=0:
+            msgLog(f"{link.name} is dead.")
+            isLinkDead = True
+            endGame()
+    
+    #change the music
     if (currentTime > 6.798) and (not isIntroFinished):
         isIntroFinished = True
         if not isLinkDead:
             PlaySound('audio/OverworldLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
         else:
             PlaySound('audio/GameOverLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
-    root.after(50, gameloop)
+    #call this function in 50 ms (so it loops)
+    root.after(25, gameloop)
 
 
 
