@@ -1,6 +1,7 @@
 from player import Player
 from enemies import Moblin
 import tiles
+from point import Point
 import asyncio
 import tkinter as tk
 import time
@@ -38,7 +39,8 @@ global isLinkDead
 def msgLog(text):
     msgBox.config(state=tk.NORMAL)#make text box editable
     msgBox.insert(tk.END, text)#add text to box
-    msgBox.insert(tk.END, "\n")#add escape character
+    if not (text.endswith("\n")):
+        msgBox.insert(tk.END, "\n")#add escape character if there's not already one
     msgBox.config(state=tk.DISABLED)#make text box uneditable
     #scroll to bottom of box
     hi = msgBox.vbar.get()[1]
@@ -46,16 +48,14 @@ def msgLog(text):
     msgBox.vbar.update()
 
 def key(event):#when the enter key is pressed
-    parseInput(link, inputBox.get(), currentTile)#pass input to function below
+    parseInput(inputBox.get())#pass input to function below
     inputBox.delete(0, 'end')
 
 def escape(event):
     inputBox.delete(0, 'end')
 
-def parseInput(link, userInputz, currentTile):
-    if isLinkDead:
-        msgLog(f"{link.name} is dead. Darkness covers the land.")
-        return
+def parseInput(userInputz):
+    global isLinkDead
     msgLog(">"+userInputz)
     #define item descriptions
     itemDescriptions = {
@@ -71,9 +71,6 @@ def parseInput(link, userInputz, currentTile):
     for word in inputWords:
         if word in removeWords:
             inputWords.remove(word)
-    if len(inputWords) > 3:
-        msgLog("# Phrase contained more than 3 words. #")
-        return
     #assign words to variables
     try:
         actionWord = inputWords[0]
@@ -87,11 +84,44 @@ def parseInput(link, userInputz, currentTile):
         targetWord = inputWords[2]
     except:
         targetWord = None
-
-    #switch to correct command
-    if actionWord in ["go"]:
+    #check fo reasons to not run command
+    if isLinkDead:
+        msgLog(f"{link.name} is dead. Darkness covers the land.")
+        if not actionWord in ["quit", "exit"]:
+            return
+    if len(inputWords) > 3:
+        msgLog("# Phrase contained more than 3 words. #")
         return
-        #move player based on objectWord TODO###########
+    #switch to correct command
+    #go
+    if actionWord in ["go"]:
+        global currentTile
+        directions = {
+            "north":0,
+            "east":1, 
+            "south":2, 
+            "west":3, 
+            "up":4, 
+            "down":5
+        }
+        try:
+            direction = directions[objectWord]
+        except:
+            msgLog("# Specified direction is invalid. Try North, East, South, West, Up, or Down. #")
+            return
+        
+        if currentTile.exitsPos[direction]:
+            newPos = currentTile.exitsPos[direction]
+            currentTile = map[newPos.x][newPos.y][newPos.z]
+            msgLog(currentTile.intro_text())
+        else:
+            if currentTile.hiddenExitsPos[direction] and currentTile.hiddenExitRevealed[direction]:
+                newPos = currentTile.hiddenExitsPos[direction]
+                currentTile = map[newPos.x][newPos.y][newPos.z]
+                msgLog(currentTile.intro_text())
+            else:
+                msgLog("# You can't go that way. #")
+    #engage
     elif actionWord in ["engage", "eng", "approach", "app"]:
         try:
             enemy = currentTile.enemySearch(objectWord, targetWord)
@@ -102,19 +132,45 @@ def parseInput(link, userInputz, currentTile):
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
         except:
             msgLog("## Input error. ##")
+    #disengage
     elif actionWord in ["disengage", "dis", "run"]:
         link.engage("", "")
         msgLog("Disengaged from all enemies.")
+    #attack
     elif actionWord in ["attack"]:
+        if not(("sword" in link.inventory) or ("white sword" in link.inventory) or ("magical sword" in link.inventory)):
+            msgLog("# You cannot attack without a sword. #")
+            return
+        if not objectWord:
+            msgLog("# Must specify enemy type #")
+            return
         enemy = currentTile.enemySearch(objectWord, targetWord)
         if enemy:
             msgLog(link.attack(enemy))
         else:
-            msgLog(f"# {objectWord} {targetWord} is not present. #")
+            if objectWord in ["old"] and currentTile.pos == Point(0,0,0):
+                msgLog("# You can't attack an NPC. #")
+            else:
+                msgLog(f"# {objectWord} {targetWord} is not present. #")
+    #take
+    elif actionWord in ["take"]:
+        item = ""
+        if targetWord:
+            item = objectWord + ' ' + targetWord
+        else:
+            item = objectWord
+        if item in currentTile.items:
+            msgLog(f"{item} added to your inventory.")
+            link.inventory.append(item)
+            currentTile.items.remove(item)
+        else:
+            msgLog(f"# {item} is not present. #")
+    #look
     elif actionWord in ["look"]:
         msgLog(currentTile.intro_text())
         if objectWord:
             msgLog("Use examine to get a description of an object.")
+    #examine
     elif actionWord in ["examine"]:
         item = ""
         if targetWord:
@@ -128,10 +184,13 @@ def parseInput(link, userInputz, currentTile):
                 msgLog(f"## Description for {item} not found. ##")
         else:
             msgLog(f"# {item} is not in your inventory. #")
-
+    #inventory
     elif actionWord in ["inventory"]:
-        msgLog(link.inventory)
-
+        link.inventory.sort()
+        msgLog("You have the following items in your inventory:")
+        for item in link.inventory:
+            msgLog(item)
+    #give
     elif actionWord in ["xyzzy"]:
         item = ""
         if targetWord:
@@ -140,15 +199,27 @@ def parseInput(link, userInputz, currentTile):
             item = objectWord
         link.inventory.append(item)
         msgLog(f"{item} added to inventory.")
-
+    #debug coordinates
+    elif actionWord in ["coords"]:
+        msgLog(f"{currentTile.pos.x},{currentTile.pos.y},{currentTile.pos.z}")
+    #suicide
     elif actionWord in ["suicide"]:
         link.hp = 0
         isLinkDead = True
         endGame()
+    #help
+    elif actionWord in ["help"]:
+        msgLog("# Refer to the user manual for a list of commands. #")
+    #quit
+    elif actionWord in ["quit", "exit"]:
+        msgLog("Quitting...")
+        quit()
+    #not recognised
     else:
         msgLog("## Command not recognised. ##")
 
 def endGame():
+    inputBox.delete(0, 'end')
     msgLog("===============")
     msgLog("   GAME OVER   ")
     msgLog("===============")
@@ -166,7 +237,7 @@ def gameloop():
 
     if (currentTime > 6.798) and (not isIntroFinished):
         isIntroFinished = True
-        if isLinkDead:
+        if not isLinkDead:
             PlaySound('audio/OverworldLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
         else:
             PlaySound('audio/GameOverLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
@@ -216,8 +287,22 @@ if __name__ == "__main__":
     input("< Press enter to continue >")
     playerName = input("REGISTER YOUR NAME\n")
     link = Player(playerName, 3)
+    #Log starting message
+    print(
+        f'''
+        The Legend of Zelda\n
+        Many years ago prince darkenss "Gannon" stole one of the 
+        Triforce with Power. Princess Zelda had one of the Triforce 
+        with Wisdom. She divided it into "8" units to hide it from 
+        "Gannon" before she was captured.\n
+        Go find the "8" units "{link.name}" to save her.\n
+        '''
+    )
+    input("< Press enter to continue >")
     #import map
+    global map
     map = tiles.getOverworldTiles()
+    global currentTile
     currentTile = map[0][0][1]
     #set starting inventory
     link.inventory.append("wooden shield")
@@ -238,6 +323,7 @@ if __name__ == "__main__":
     inputBox.place(bordermode=tk.OUTSIDE, height=20, width=1000, y = 480)
     inputBox.bind("<Return>", key)
     inputBox.bind("<Escape>", escape)
+    inputBox.focus_set()
     #add output box with scroll bar
     msgBox = ScrolledText.ScrolledText(root)
     msgBox.pack()
@@ -247,16 +333,21 @@ if __name__ == "__main__":
     root.lift()
     root.attributes('-topmost',True)
     root.after_idle(root.attributes,'-topmost',False)
+    root.focus_force()
+    root.after(1, lambda: root.focus_force())
     #initialize global variables
     startTime = time.time()
     currentTime = 0
+    global isLinkDead
     isLinkDead = False
     #start main game music
     PlaySound('audio/Overworld.wav', SND_FILENAME|SND_ASYNC)
     global isIntroFinished
     isIntroFinished = False
+    #log message for starting room
+    msgLog(currentTile.intro_text())
     #start gameloop
-    root.after(0, gameloop)
+    root.after(2, gameloop)
     #open window
     tk.mainloop()
     ## END MAIN ##
