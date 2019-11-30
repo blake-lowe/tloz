@@ -241,9 +241,7 @@ def endGame():
 def initTile():
     msgLog(currentTile.intro_text())
     for enemy in currentTile.enemiez:
-        print(enemy.nextActionTime)
         enemy.nextActionTime = currentTime + random.random()*enemy.actionSpeed
-        print(enemy.nextActionTime)
     return
 
 ## This loop is repeatedly called with tkinter libraries to allow game logic to occur ##

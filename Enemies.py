@@ -20,7 +20,7 @@ class Enemy:
 
 class Moblin(Enemy):
     def __init__(self, number):
-        super().__init__(number, "moblin", 2, 3)
+        super().__init__(number, "moblin", 2, 4)
 
     def action(self, player):
         accuracy = 50#percent chance of throwing spear on target
