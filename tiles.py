@@ -2,7 +2,7 @@ from point import Point
 import enemies
 
 class MapTile:
-    def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemies, items, objects):
+    def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemiez, items, objects):
         self.pos = pos
         self.description = description
         self.exitsPos = exitsPos#[North, East, South, West, Up, Down]
@@ -10,7 +10,7 @@ class MapTile:
         self.hiddenExitsPos = hiddenExitsPos
         self.hiddenExitsDescriptions = hiddenExitsDescriptions
         self.hiddenExitRevealed = hiddenExitRevealed
-        self.enemies = enemies
+        self.enemiez = enemiez
         self.items = items
         self.objects = objects
     def intro_text(self):
@@ -24,7 +24,7 @@ class MapTile:
                 outputLines += self.hiddenExitsDescriptions[i] + "\n"
         return outputLines
     def enemySearch(self, name, num):
-        for enemy in enemies:
+        for enemy in self.enemiez:
             if enemy.name == name and enemy.num == num:
                 return enemy
         return None
