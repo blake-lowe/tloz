@@ -22,9 +22,13 @@ class MapTile:
             if exit:
                 outputLines += exit + "\n"
         #add hidden exit descriptions if revealed
-        for i in range(0, 6):
+        i = 0
+        
+        while i < 6:
             if self.hiddenExitRevealed[i]:
                 outputLines += self.hiddenExitsDescriptions[i] + "\n"
+            i += 1
+
         #add items if present
         if self.items:
             outputLines += "The following items are present:\n"
@@ -45,7 +49,7 @@ class MapTile:
 
 def getOverworldTiles():
     w, d, h = 2, 2, 2
-    tileList = [[[None for x in range(w)] for y in range(h)] for z in range(d)]
+    tileList = [[[None for x in range(w)] for y in range(h)] for z in range(d)]#nested loop
     #starting room
     tileList[0][0][1] = MapTile(
         Point(0,0,1),#this tile position
