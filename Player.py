@@ -3,25 +3,26 @@ class Player:
         self.name = name
         self.hp = hp
         self.maxhp = maxhp
+        self.rupies = 0
         self.inventory = []
         self.target_name = ""
         self.target_num = ""
         self.isDodging = False
-        self.dodgeDuration = 0.35
+        self.dodgeDuration = 0.5
         self.stopDodgingTime = 0
         
-    def is_alive(self):
+    def isAlive(self):
         return self.hp > 0
     
-    def is_engaged(self, Enemy):
-        if self.target_name == Enemy.name and self.target_num == Enemy.num:
+    def isEngaged(self, Enemy):
+        if self.target_name.lower() == Enemy.name.lower() and self.target_num.lower() == Enemy.num.lower():
             return True
         else:
             return False
 
     def engage(self, Enemy):
-        self.target_name = Enemy.name
-        self.target_num = Enemy.num
+        self.target_name = Enemy.name.lower()
+        self.target_num = Enemy.num.lower()
         
     def attack(self, Enemy):
         if "magical sword" in self.inventory:

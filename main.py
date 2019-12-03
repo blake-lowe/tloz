@@ -115,11 +115,15 @@ def parseInput(userInputz):
             return
         
         if currentTile.exitsPos[direction]:
+            for enemy in currentTile.enemiez:
+                enemy.action(link)
             newPos = currentTile.exitsPos[direction]
             currentTile = map[newPos.x][newPos.y][newPos.z]
             initTile()
         else:
             if currentTile.hiddenExitsPos[direction] and currentTile.hiddenExitRevealed[direction]:
+                for enemy in currentTile.enemiez:
+                    enemy.action(link)
                 newPos = currentTile.hiddenExitsPos[direction]
                 currentTile = map[newPos.x][newPos.y][newPos.z]
                 initTile()
@@ -138,7 +142,8 @@ def parseInput(userInputz):
             msgLog("## Input error. ##")
     #disengage
     elif actionWord in ["disengage", "dis", "run"]:
-        link.engage("", "")
+        link.target_name = ""
+        link.target_num = ""
         msgLog("Disengaged from all enemies.")
     #attack
     elif actionWord in ["attack"]:
@@ -150,7 +155,7 @@ def parseInput(userInputz):
             return
         enemy = currentTile.enemySearch(objectWord, targetWord)
         if enemy:
-            if link.is_engaged(enemy):
+            if link.isEngaged(enemy):
                 msgLog(link.attack(enemy))
                 msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
             else:
@@ -182,10 +187,22 @@ def parseInput(userInputz):
         if item in currentTile.items:
             if item == "heart":
                 link.hp += 1
+                if link.hp > link.maxhp:
+                    link.hp = link.maxhp
                 msgLog(f"One heart recovered. You currently have {link.hp} hearts.")
             elif item == "fairy":
                 link.hp = link.maxhp
                 msgLog(f"All hearts recovered. You currently have {link.hp} hearts.")
+            elif item == "rupy":
+                link.rupies += 1
+                msgLog(f"One rupy added. You currently have {link.rupies} rupies.")
+            elif item == "5 rupies":
+                link.rupies += 5
+                msgLog(f"5 rupies added. You currently have {link.rupies} rupies.")
+            elif item == "clock":
+                for enemy in currentTile.enemiez:
+                    enemy.nextActionTime += 100000
+                msgLog("All enemies have been frozen in place.")
             else:
                 msgLog(f"{item} added to your inventory.")
                 link.inventory.append(item)
@@ -214,14 +231,26 @@ def parseInput(userInputz):
                 msgLog(f"All hearts recovered. You currently have {link.hp} hearts.")
             elif item == "heart":
                 link.hp += 1
+                if link.hp > link.maxhp:
+                    link.hp = link.maxhp
                 msgLog(f"One heart recovered. You currently have {link.hp} hearts.")
+            elif item == "rupy":
+                link.rupies += 1
+                msgLog(f"One rupy added. You currently have {link.rupies} rupies.")
+            elif item == "5 rupies":
+                link.rupies += 5
+                msgLog(f"5 rupies added. You currently have {link.rupies} rupies.")
+            elif item == "clock":
+                for enemy in currentTile.enemiez:
+                    enemy.nextActionTime += 100000
+                msgLog("All enemies have been frozen in place.")
             else:
                 msgLog(f"# {item} is not useable. #")
         else:
             msgLog(f"# {item} is not in your inventory. #")
     #status
-    elif actionWord in ["status", "hp", "health"]:
-        msgLog(f"You currently have {link.hp} hearts.")
+    elif actionWord in ["status", "hp", "health", "rupies"]:
+        msgLog(f"You currently have {link.hp} hearts and {link.rupies} rupies.")
     #look
     elif actionWord in ["look"]:
         msgLog(currentTile.intro_text())
@@ -273,28 +302,33 @@ def parseInput(userInputz):
     elif actionWord in ["coords"]:
         msgLog(f"{currentTile.pos.x},{currentTile.pos.y},{currentTile.pos.z}")
     #selfdamage
-    elif actionWord in ["selfDamage"]:
+    elif actionWord in ["selfdamage"]:
         try:
             damage = int(objectWord)
             if damage:
                 link.hp -= damage
-                msgLog(f"Lost {damage} hearts.")
+                msgLog(f"Lost {damage} hearts. You currently have {link.hp} hearts.")
+                
         except:
             msgLog("## Input Error ##")
     #selfheal
-    elif actionWord in ["selfHeal"]:
+    elif actionWord in ["selfheal"]:
         try:
             damage = int(objectWord)
             if damage:
                 link.hp += damage
-                msgLog(f"Recovered {damage} hearts.")
+                if link.hp > link.maxhp:
+                    link.hp = link.maxhp
+                msgLog(f"Recovered {damage} hearts. You currently have {link.hp} hearts.")
         except:
             msgLog("## Input Error ##")
     #suicide
-    elif actionWord in ["killPlayer"]:
-        link.hp = 0
+    elif actionWord in ["killplayer"]:
+        #link.hp = 0
         isLinkDead = True
         endGame()
+    elif actionWord in ["ping"]:
+        msgLog("pong")
     #help
     elif actionWord in ["help"]:
         msgLog("# Refer to the user manual for a list of commands. #")
@@ -346,14 +380,13 @@ def gameloop():
             drop = enemy.drops[random.randint(0, len(enemy.drops)-1)]
             if drop:
                 currentTile.items.append(drop)
-                msgLog(f"{enemy.name} {enemy.num} dropped a {drop}.")
+                msgLog(f"{enemy.name} {enemy.num} dropped \"{drop}\".")
                 currentTile.items.sort()
     #let enemies do actions
     if not isLinkDead:
         for enemy in currentTile.enemiez:
             if currentTime > enemy.nextActionTime:
                 msgLog(enemy.action(link))
-                enemy.nextActionTime += enemy.actionSpeed
     
     if currentTile.pos.x == 0 and currentTile.pos.y == 2 and currentTile.pos.z == 1:
         winGame()

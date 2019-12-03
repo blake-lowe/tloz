@@ -1,5 +1,5 @@
 from point import Point
-from enemies import Moblin
+from enemies import Moblin, Tektite
 
 class MapTile:
     def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemiez, items, objects):
@@ -43,7 +43,7 @@ class MapTile:
 
     def enemySearch(self, name, num):
         for enemy in self.enemiez:
-            if enemy.name == name and enemy.num == num:
+            if enemy.name.lower() == name.lower() and enemy.num.lower() == num.lower():
                 return enemy
         return None
 
@@ -85,7 +85,7 @@ def getOverworldTiles():
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, False],#is the hidden exit revealed
-        [Moblin("1"), Moblin("2")],#enemies
+        [Tektite("1")],#enemies
         [],#items
         []#objects
         )
