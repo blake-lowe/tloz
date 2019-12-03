@@ -48,7 +48,7 @@ class MapTile:
         return None
 
 def getOverworldTiles():
-    w, d, h = 2, 2, 2
+    w, d, h = 3, 3, 3
     tileList = [[[None for x in range(w)] for y in range(h)] for z in range(d)]#nested loop
     #starting room
     tileList[0][0][1] = MapTile(
@@ -79,9 +79,9 @@ def getOverworldTiles():
     #moblin room (beach)
     tileList[0][1][1] = MapTile(
         Point(0,1,1),#this tile position
-        "You come to a bridge leading NORTH to a small island",#tile description
-        [None, None, Point(0,0,1), None, None, None],#exits
-        [None, None, "A path leads SOUTH to a clearing in the forest.", None, None, None],#exit descriptions
+        "You come to a bridge.",#tile description
+        [Point(0,2,1), None, Point(0,0,1), None, None, None],#exits
+        ["The bridge leads to an island to the NORTH.", None, "A path leads SOUTH to a clearing in the forest.", None, None, None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, False],#is the hidden exit revealed
@@ -91,6 +91,18 @@ def getOverworldTiles():
         )
     #spider room
     #zelda room (here's all 8 units of the triforce of wisdom. Ganon lays dead on the ground)
+    tileList[0][2][1] = MapTile(
+        Point(0, 2, 1),#this tile position
+        "You win!",#tile description
+        [None, None, Point(0,1,1), None, None, None],#exits
+        [None, None, None, "A bridge leads SOUTH to the forest.", None, None],#exit descriptions
+        [None, None, None, None, None, None],#hidden exits
+        [None, None, None, None, None, None],#hidden exit descriptions
+        [False, False, False, False, False, False],#is the hidden exit revealed
+        [],#enemies
+        [],#items
+        []#objects
+    )
     return tileList
 
 def getLvl1Tiles():

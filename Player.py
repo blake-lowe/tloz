@@ -1,7 +1,8 @@
 class Player:
-    def __init__(self, name, hp):
+    def __init__(self, name, hp, maxhp):
         self.name = name
         self.hp = hp
+        self.maxhp = maxhp
         self.inventory = []
         self.target_name = ""
         self.target_num = ""

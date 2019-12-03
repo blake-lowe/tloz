@@ -150,14 +150,22 @@ def parseInput(userInputz):
             return
         enemy = currentTile.enemySearch(objectWord, targetWord)
         if enemy:
-            msgLog(link.attack(enemy))
-            msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
-            if enemy.hp <= 0:
-                msgLog(f"{objectWord} {targetWord} is dead.")
-                currentTile.enemiez.remove(enemy)
+            if link.is_engaged(enemy):
+                msgLog(link.attack(enemy))
+                msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
+            else:
+                msgLog(f"You must be engaged with {objectWord} {targetWord} to hit it with your sword.")
+            if link.hp == link.maxhp:
+                msgLog(f"An image of your sword flies toward {objectWord} {targetWord}")
+                swordBeamDmg = 1
+                enemy.hp -= swordBeamDmg
+                msgLog(f"Your sword beam deals {swordBeamDmg} damage to {objectWord} {targetWord}")
+                msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
         else:
             if objectWord in ["old"] and currentTile.pos.x == 0 and currentTile.pos.y == 0 and currentTile.pos.z == 0:
-                msgLog("# You can't attack an NPC. #")
+                msgLog("The flames beside the old man flare up and shoot fireballs at you!")
+                link.hp -= 1
+                msgLog("You lose 1 heart.")
             else:
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
 
@@ -170,11 +178,39 @@ def parseInput(userInputz):
         else:
             item = objectWord
         if item in currentTile.items:
-            msgLog(f"{item} added to your inventory.")
-            link.inventory.append(item)
+            if item == "heart":
+                link.hp += 1
+                msgLog(f"One heart recovered. You currently have {link.hp} hearts.")
+            else:
+                msgLog(f"{item} added to your inventory.")
+                link.inventory.append(item)
             currentTile.items.remove(item)
         else:
             msgLog(f"# {item} is not present. #")
+    #use
+    elif actionWord in ["use"]:
+        item = ""
+        if targetWord:
+            item = objectWord + ' ' + targetWord
+        else:
+            item = objectWord
+        if item in link.inventory:
+            if item == "heart container":
+                link.maxhp += 1
+                link.hp += 1
+                msgLog(f"Heart container used. Your maximum hearts has been increased to {link.maxhp}. You currently have {link.hp} hearts.")
+                link.inventory.remove(item)
+            elif item == "life potion":
+                link.hp = link.maxhp
+                msgLog(f"Hearts increased to maximum of {link.hp}.")
+                link.inventory.remove(item)
+            else:
+                msgLog(f"# {item} is not useable. #")
+        else:
+            msgLog(f"# {item} is not in your inventory. #")
+    #status
+    elif actionWord in ["status", "hp", "health"]:
+        msgLog(f"You currently have {link.hp} hearts.")
     #look
     elif actionWord in ["look"]:
         msgLog(currentTile.intro_text())
@@ -251,7 +287,16 @@ def gameloop():
     global currentTime
     global isIntroFinished
     currentTime = time.time()-startTime
-    
+    #check if enemies dead
+    for enemy in currentTile.enemiez:
+        if enemy.hp <= 0:
+            msgLog(f"{enemy.name} {enemy.num} is dead.")
+            currentTile.enemiez.remove(enemy)
+            drop = enemy.drops[random.randint(0, len(enemy.drops)-1)]
+            if drop:
+                currentTile.items.append(drop)
+                msgLog(f"{enemy.name} {enemy.num} dropped a {drop}.")
+                currentTile.items.sort()
     #let enemies do actions
     if not isLinkDead:
         for enemy in currentTile.enemiez:
@@ -318,7 +363,7 @@ if __name__ == "__main__":
     #get player name
     input("< Press enter to continue >")
     playerName = input("REGISTER YOUR NAME\n")
-    link = Player(playerName, 3)
+    link = Player(playerName, 3, 3)
     #Log starting message
     print(
         f'''

@@ -6,6 +6,7 @@ class Enemy:
         self.name = name
         self.num = num
         self.hp = hp
+        self.drops = []
         self.actionSpeed = actionSpeed#seconds per action
         self.nextActionTime = actionSpeed*random.random()
 
@@ -21,6 +22,7 @@ class Enemy:
 class Moblin(Enemy):
     def __init__(self, number):
         super().__init__(number, "moblin", 2, 4)
+        self.drops = [None, "heart"]
 
     def action(self, player):
         accuracy = 50#percent chance of throwing spear on target
