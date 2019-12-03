@@ -168,8 +168,10 @@ def parseInput(userInputz):
                 msgLog("You lose 1 heart.")
             else:
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
-
-        ##TODO check if engaged with enemy and do sword beams
+                #dodge
+    elif actionWord in ["dodge"]:
+        link.isDodging = True
+        link.stopDodgingTime = currentTime + link.dodgeDuration
     #take
     elif actionWord in ["take", "get"]:
         item = ""
@@ -181,6 +183,9 @@ def parseInput(userInputz):
             if item == "heart":
                 link.hp += 1
                 msgLog(f"One heart recovered. You currently have {link.hp} hearts.")
+            elif item == "fairy":
+                link.hp = link.maxhp
+                msgLog(f"All hearts recovered. You currently have {link.hp} hearts.")
             else:
                 msgLog(f"{item} added to your inventory.")
                 link.inventory.append(item)
@@ -204,6 +209,12 @@ def parseInput(userInputz):
                 link.hp = link.maxhp
                 msgLog(f"Hearts increased to maximum of {link.hp}.")
                 link.inventory.remove(item)
+            elif item == "fairy":
+                link.hp = link.maxhp
+                msgLog(f"All hearts recovered. You currently have {link.hp} hearts.")
+            elif item == "heart":
+                link.hp += 1
+                msgLog(f"One heart recovered. You currently have {link.hp} hearts.")
             else:
                 msgLog(f"# {item} is not useable. #")
         else:
@@ -245,11 +256,42 @@ def parseInput(userInputz):
             item = objectWord
         link.inventory.append(item)
         msgLog(f"{item} added to inventory.")
+    #teleport
+    elif actionWord in ["warp"]:
+        x = int(objectWord[0])
+        y = int(objectWord[1])
+        z = int(objectWord[2])
+        newTile = map[x][y][z]
+        if newTile:
+            msgLog(f"Warped to {x} {y} {z}.")
+            currentTile = newTile
+            initTile()
+        else:
+            msgLog(f"{x} {y} {z} not found.")
+
     #debug coordinates
     elif actionWord in ["coords"]:
         msgLog(f"{currentTile.pos.x},{currentTile.pos.y},{currentTile.pos.z}")
+    #selfdamage
+    elif actionWord in ["selfDamage"]:
+        try:
+            damage = int(objectWord)
+            if damage:
+                link.hp -= damage
+                msgLog(f"Lost {damage} hearts.")
+        except:
+            msgLog("## Input Error ##")
+    #selfheal
+    elif actionWord in ["selfHeal"]:
+        try:
+            damage = int(objectWord)
+            if damage:
+                link.hp += damage
+                msgLog(f"Recovered {damage} hearts.")
+        except:
+            msgLog("## Input Error ##")
     #suicide
-    elif actionWord in ["suicide"]:
+    elif actionWord in ["killPlayer"]:
         link.hp = 0
         isLinkDead = True
         endGame()
@@ -272,6 +314,15 @@ def endGame():
     msgLog("===============")
     PlaySound(None, SND_FILENAME)
     PlaySound('audio/GameOver.wav', SND_FILENAME)
+
+def winGame():
+    inputBox.delete(0, 'end')
+    msgLog(f"Thanks {link.name}, you're the hero of Hyrule.")
+    msgLog(f"Finally peace returns to Hyrule.")
+    msgLog(f"This ends the story.")
+    ##TODO play end game music
+    time.sleep(10)
+    quit()
 
 #get a tile ready for player entry
 def initTile():
@@ -304,11 +355,17 @@ def gameloop():
                 msgLog(enemy.action(link))
                 enemy.nextActionTime += enemy.actionSpeed
     
+    if currentTile.pos.x == 0 and currentTile.pos.y == 2 and currentTile.pos.z == 1:
+        winGame()
+    
     #check for player death
-        if link.hp <=0:
-            msgLog(f"{link.name} is dead.")
-            isLinkDead = True
-            endGame()
+    if link.hp <=0:
+        msgLog(f"{link.name} is dead.")
+        isLinkDead = True
+        endGame()
+    
+    if link.stopDodgingTime < currentTime:
+        link.isDodging = False
     
     #change the music
     if (currentTime > 6.798) and (not isIntroFinished):

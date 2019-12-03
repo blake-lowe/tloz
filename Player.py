@@ -6,6 +6,9 @@ class Player:
         self.inventory = []
         self.target_name = ""
         self.target_num = ""
+        self.isDodging = False
+        self.dodgeDuration = 0.35
+        self.stopDodgingTime = 0
         
     def is_alive(self):
         return self.hp > 0

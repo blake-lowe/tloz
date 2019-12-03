@@ -93,7 +93,7 @@ def getOverworldTiles():
     #zelda room (here's all 8 units of the triforce of wisdom. Ganon lays dead on the ground)
     tileList[0][2][1] = MapTile(
         Point(0, 2, 1),#this tile position
-        "You win!",#tile description
+        "On the island, Princess Zelda waits for you. Zelda says, \"You must have been asleep for a long time. I defeated \"Gannon,\" took back the Triforce with Power, and collected the units of the Triforce with Wisdom. ",#tile description
         [None, None, Point(0,1,1), None, None, None],#exits
         [None, None, None, "A bridge leads SOUTH to the forest.", None, None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
