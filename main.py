@@ -35,6 +35,7 @@ global startTime
 global currentTime
 global isIntroFinished
 global isLinkDead
+global isGameWon
 
 #log messages to the ouput window
 def msgLog(text):
@@ -91,6 +92,12 @@ def parseInput(userInputz):
     #check fo reasons to not run command
     if isLinkDead:
         msgLog(f"{link.name} is dead. Darkness covers the land.")
+        if not actionWord in ["quit", "exit"]:
+            return
+    if isGameWon:
+        msgLog(f"Thanks {link.name}, you're the hero of Hyrule.")
+        msgLog(f"Finally peace returns to Hyrule.")
+        msgLog(f"This ends the story.")
         if not actionWord in ["quit", "exit"]:
             return
     if len(inputWords) > 3:
@@ -167,10 +174,10 @@ def parseInput(userInputz):
                 msgLog(f"Your sword beam deals {swordBeamDmg} damage to {objectWord} {targetWord}")
                 msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
         else:
-            if objectWord in ["old"] and currentTile.pos.x == 0 and currentTile.pos.y == 0 and currentTile.pos.z == 0:
+            if objectWord in ["old"] and currentTile.pos.x == 3 and currentTile.pos.y == 0 and currentTile.pos.z == 0:
                 msgLog("The flames beside the old man flare up and shoot fireballs at you!")
                 link.hp -= 1
-                msgLog("You lose 1 heart.")
+                msgLog(f"You lose 1 heart. You have {link.hp} hearts remaining.")
             else:
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
                 #dodge
@@ -206,6 +213,8 @@ def parseInput(userInputz):
             else:
                 msgLog(f"{item} added to your inventory.")
                 link.inventory.append(item)
+                PlaySound('audio/Item.wav', SND_FILENAME)
+                PlaySound('audio/OverworldLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
             currentTile.items.remove(item)
         else:
             msgLog(f"# {item} is not present. #")
@@ -351,12 +360,44 @@ def endGame():
 
 def winGame():
     inputBox.delete(0, 'end')
+    msgLog("")
     msgLog(f"Thanks {link.name}, you're the hero of Hyrule.")
     msgLog(f"Finally peace returns to Hyrule.")
     msgLog(f"This ends the story.")
-    ##TODO play end game music
-    time.sleep(10)
-    quit()
+    msgLog(
+        '''
+ .--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--.
+/ .. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\
+\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/ /
+ \\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /
+ / /\\/ /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /\\/ /\\
+/ /\\ \\/`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'\\ \\/\\ \\
+\\ \\/\\ \\                                                                            /\\ \\/ /
+ \\/ /\\ \\                      ___________________________                         / /\\/ /
+ / /\\/ /              THE LEGEND OF ——————————————————  /                        \\ \\/ /\\
+/ /\\ \\/                   ____\\_\\    ______  _   ____/ / __                        \\ \\/\\ \\
+\\ \\/\\ \\                  /___  / \\  / ____/ / / |  __ \\ |  \\                       /\\ \\/ /
+ \\/ /\\ \\                    / / \\ \\/ /__   / /  | |/ | ||   \\                     / /\\/ /
+ / /\\/ /                   / /   \\/ ___/  / /   | | |  || |\\ \\                    \\ \\/ /\\
+/ /\\ \\/                   / /___ / //___ / /___ | |/_| || ___ \\                    \\ \\/\\ \\
+\\ \\/\\ \\                  /_____//______//_____/ |_____/ |_|  \\_\\                   /\\ \\/ /
+ \\/ /\\ \\                            \\ \\        / /                                / /\\/ /
+ / /\\/ /     ________________________\\_\\______/_/________________________/^^^^|   \\ \\/ /\\
+/ /\\ \\/       ---_____________________________________________________|-&\\\\\\\\||    \\ \\/\\ \\
+\\ \\/\\ \\                                \\ \\  / /                          \\___/     /\\ \\/ /
+ \\/ /\\ \\                                \\ \\/ /                                    / /\\/ /
+ / /\\/ /                                 \\  /                                     \\ \\/ /\\
+/ /\\ \\/                                   \\/                                       \\ \\/\\ \\
+\\ \\/\\ \\                                                                            /\\ \\/ /
+ \\/ /\\/\\--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--/ /\\/ /
+ / /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\
+/ /\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\bl/\\ \\
+\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `'\\ `' /
+ `--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'
+
+'''
+    )
+    PlaySound('audio/Ending.wav', SND_FILENAME|SND_ASYNC)
 
 #get a tile ready for player entry
 def initTile():
@@ -368,6 +409,7 @@ def initTile():
 ## This loop is repeatedly called with tkinter libraries to allow game logic to occur ##
 def gameloop():
     global isLinkDead
+    global isGameWon
     #update time
     global currentTime
     global isIntroFinished
@@ -388,7 +430,8 @@ def gameloop():
             if currentTime > enemy.nextActionTime:
                 msgLog(enemy.action(link))
     
-    if currentTile.pos.x == 0 and currentTile.pos.y == 2 and currentTile.pos.z == 1:
+    if currentTile.pos.x == 3 and currentTile.pos.y == 2 and currentTile.pos.z == 1 and not isGameWon:
+        isGameWon = True
         winGame()
     
     #check for player death
@@ -470,7 +513,7 @@ if __name__ == "__main__":
     global map
     map = tiles.getOverworldTiles()
     global currentTile
-    currentTile = map[0][0][1]
+    currentTile = map[3][0][1]
     #set starting inventory
     link.inventory.append("wooden shield")
     #stop title screen music
@@ -480,21 +523,21 @@ if __name__ == "__main__":
     root.resizable(False, False)
     canvas1 = tk.Canvas(root)
     #set dimensions
-    root.geometry("1000x500")
+    root.geometry("1000x800")
     #change window title and icon
     root.title("The Legend of Zelda")
     root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='icon.png'))
     #add input field
     inputBox = tk.Entry(root)
     inputBox.pack()
-    inputBox.place(bordermode=tk.OUTSIDE, height=20, width=1000, y = 480)
+    inputBox.place(bordermode=tk.OUTSIDE, height=30, width=1000, y = 770)
     inputBox.bind("<Return>", key)
     inputBox.bind("<Escape>", escape)
     inputBox.focus_set()
     #add output box with scroll bar
     msgBox = ScrolledText.ScrolledText(root)
     msgBox.pack()
-    msgBox.place(bordermode=tk.OUTSIDE, height=480, width=1000, y = 0)
+    msgBox.place(bordermode=tk.OUTSIDE, height=770, width=1000, y = 0)
     msgBox.config(state=tk.DISABLED)
     #bring window to front
     root.lift()
@@ -507,6 +550,8 @@ if __name__ == "__main__":
     currentTime = 0
     global isLinkDead
     isLinkDead = False
+    global isGameWon
+    isGameWon = False
     #start main game music
     PlaySound('audio/Overworld.wav', SND_FILENAME|SND_ASYNC)
     global isIntroFinished

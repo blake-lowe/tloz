@@ -2,7 +2,7 @@ from point import Point
 from enemies import Moblin, Tektite
 
 class MapTile:
-    def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemiez, items, objects):
+    def __init__(self, pos, description, exitsPos, exitsDescriptions, hiddenExitsPos, hiddenExitsDescriptions, hiddenExitRevealed, enemiez, items, objects, itemText):
         self.pos = pos
         self.description = description
         self.exitsPos = exitsPos#[North, East, South, West, Up, Down]
@@ -13,10 +13,14 @@ class MapTile:
         self.enemiez = enemiez
         self.items = items
         self.objects = objects
+        self.itemText = itemText
     def intro_text(self):
         outputLines = ""
         #add description
-        outputLines += self.description + "\n"
+        outputLines += self.description
+        if len(self.items)>0:
+            outputLines += self.itemText
+        outputLines += "\n"
         #add exit descriptions
         for exit in self.exitsDescriptions:
             if exit:
@@ -48,60 +52,64 @@ class MapTile:
         return None
 
 def getOverworldTiles():
-    w, d, h = 3, 3, 3
+    w, d, h = 5, 5, 5
     tileList = [[[None for x in range(w)] for y in range(h)] for z in range(d)]#nested loop
     #starting room
-    tileList[0][0][1] = MapTile(
-        Point(0,0,1),#this tile position
+    tileList[3][0][1] = MapTile(
+        Point(3,0,1),#this tile position
         "You find yourself in a clearing in the forest.",#tile description
-        [Point(0,1,1), None, None, None, None, None],#exits
+        [Point(3,1,1), None, None, None, None, None],#exits
         ["A path through the trees leads to the NORTH.", None, None, None, None, None],#exit descriptions
-        [None, None, None, None, None, Point(0,0,0)],#hidden exits
+        [None, None, None, None, None, Point(3,0,0)],#hidden exits
         [None, None, None, None, None, "A cave entrance is cut into the hill leading DOWN."],#hidden exit descriptions
         [False, False, False, False, False, True],#is the hidden exit revealed
         [],#enemies
         [],#items
-        []#objects
+        [],#objects
+        ""
         )
     #old man room
-    tileList[0][0][0] = MapTile(
-        Point(0,0,0),#this tile position
-        "You are in a cave lit by two flames suspended in midair. In between, stands an old man in red robes. He offers you the \nhilt of a sword saying, \"It's dangerous to go alone! Take this.\"",#tile description
-        [None, None, None, None, Point(0,0,1), None],#exits
+    tileList[3][0][0] = MapTile(
+        Point(3,0,0),#this tile position
+        "You are in a cave lit by two flames suspended in midair. In between, stands an old man in red robes. ",#tile description
+        [None, None, None, None, Point(3,0,1), None],#exits
         [None, None, None, None, "The cave's exit is back UP the way you came.", None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, None],#is the hidden exit revealed
         [],#enemies
         ["sword"],#items
-        []#objects
+        [],#objects
+        "He offers you the \nhilt of a sword saying, \"It's dangerous to go alone! Take this.\""
         )
     #moblin room (beach)
-    tileList[0][1][1] = MapTile(
-        Point(0,1,1),#this tile position
+    tileList[3][1][1] = MapTile(
+        Point(3,1,1),#this tile position
         "You come to a bridge.",#tile description
-        [Point(0,2,1), None, Point(0,0,1), None, None, None],#exits
+        [Point(3,2,1), None, Point(3,0,1), None, None, None],#exits
         ["The bridge leads to an island to the NORTH.", None, "A path leads SOUTH to a clearing in the forest.", None, None, None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, False],#is the hidden exit revealed
         [Tektite("1")],#enemies
         [],#items
-        []#objects
+        [],#objects
+        ""
         )
     #spider room
     #zelda room (here's all 8 units of the triforce of wisdom. Ganon lays dead on the ground)
-    tileList[0][2][1] = MapTile(
-        Point(0, 2, 1),#this tile position
+    tileList[3][2][1] = MapTile(
+        Point(3, 2, 1),#this tile position
         "On the island, Princess Zelda waits for you. Zelda says, \"You must have been asleep for a long time. I defeated \"Gannon,\" took back the Triforce with Power, and collected the units of the Triforce with Wisdom. ",#tile description
-        [None, None, Point(0,1,1), None, None, None],#exits
-        [None, None, None, "A bridge leads SOUTH to the forest.", None, None],#exit descriptions
+        [None, None, None, None, None, None],#exits
+        [None, None, None, None, None, None],#exit descriptions
         [None, None, None, None, None, None],#hidden exits
         [None, None, None, None, None, None],#hidden exit descriptions
         [False, False, False, False, False, False],#is the hidden exit revealed
         [],#enemies
         [],#items
-        []#objects
+        [],#objects
+        ""
     )
     return tileList
 
@@ -121,6 +129,7 @@ def getLvl1Tiles():
         [False, False, False, False, False, False],#is the hidden exit revealed
         [],#enemies
         [],#items
-        []#objects
+        [],#objects
+        ""
         )
 '''
