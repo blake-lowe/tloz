@@ -51,8 +51,10 @@ def msgLog(text):
 
 #triggered when the enter key is pressed
 def key(event):
-    parseInput(inputBox.get())#pass input to function below
+    temp = inputBox.get()
     inputBox.delete(0, 'end')
+    parseInput(temp)#pass input to function below
+
 
 #triggered when the escape key is pressed
 def escape(event):
