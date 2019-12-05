@@ -1,3 +1,26 @@
+'''
+===============================================================================
+ENGR 133 Program Description 
+	Player class, used to contain information regarding player health, inventory
+    and to handle player attacks.
+
+Assignment Information
+	Assignment:     Individual Project
+	Author:         Blake Lowe, lowe77@purdue.edu
+	Team ID:        002-10
+===============================================================================
+'''
+
+
+'''
+===============================================================================
+ACADEMIC INTEGRITY STATEMENT
+    I have not used source code obtained from any other unauthorized
+    source, either modified or unmodified. Neither have I provided
+    access to my code to another. The project I am submitting
+    is my own original work.
+===============================================================================
+'''
 class Player:
     def __init__(self, name, hp, maxhp):
         self.name = name
