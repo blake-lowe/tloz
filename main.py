@@ -1,3 +1,26 @@
+'''
+===============================================================================
+ENGR 133 Program Description 
+	Main method, handle the gameloop, user input, and conditions for the end of the game
+
+Assignment Information
+	Assignment:     Individual Project
+	Author:         Blake Lowe, lowe77@purdue.edu
+	Team ID:        002-10
+===============================================================================
+'''
+
+
+'''
+===============================================================================
+ACADEMIC INTEGRITY STATEMENT
+    I have not used source code obtained from any other unauthorized
+    source, either modified or unmodified. Neither have I provided
+    access to my code to another. The project I am submitting
+    is my own original work.
+===============================================================================
+'''
+
 from player import Player
 from enemies import Moblin
 import tiles
@@ -12,7 +35,7 @@ import os
 
 ########### SCROLL TO BOTTOM FOR MAIN METHOD ##################
 
-#list of planned commands
+#list of commands
 #go(move player) ex. go north, go n, n, s, e, w, u, d
 #engage/approach (move toward enemy) ex. engage moblin 1, eng moblin 1, approach moblin 1, app moblin 1
 #disengage/run (move away from enemy) ex. disengage moblin 1, dis moblin 1, run from moblin 1, run moblin 1
@@ -97,7 +120,7 @@ def parseInput(userInputz):
         if not actionWord in ["quit", "exit"]:
             return
     if isGameWon:
-        msgLog(f"Thanks {link.name}, you're the hero of Hyrule.")
+        msgLog(f"Thanks '{link.name}', you're the hero of Hyrule.")
         msgLog(f"Finally peace returns to Hyrule.")
         msgLog(f"This ends the story.")
         if not actionWord in ["quit", "exit"]:
@@ -143,8 +166,11 @@ def parseInput(userInputz):
         try:
             enemy = currentTile.enemySearch(objectWord, targetWord)
             if enemy:
-                link.engage(enemy)
-                msgLog(f"Engaged {objectWord} {targetWord}.")
+                if enemy.isAttackable:
+                    link.engage(enemy)
+                    msgLog(f"Engaged {objectWord} {targetWord}.")
+                else:
+                    msgLog(f"# {enemy.name} {enemy.num} is not reachable. #")
             else:
                 msgLog(f"# {objectWord} {targetWord} is not present. #")
         except:
@@ -164,19 +190,24 @@ def parseInput(userInputz):
             return
         enemy = currentTile.enemySearch(objectWord, targetWord)
         if enemy:
-            if link.isEngaged(enemy):
-                msgLog(link.attack(enemy))
-                msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
-            else:
-                msgLog(f"You must be engaged with {objectWord} {targetWord} to hit it with your sword.")
+            if not enemy.isAttackable:
+                msgLog(f"# {enemy.name} {enemy.num} is not reachable. #")
+                return
             if link.hp == link.maxhp:
                 msgLog(f"An image of your sword flies toward {objectWord} {targetWord}")
                 swordBeamDmg = 1
                 enemy.hp -= swordBeamDmg
                 msgLog(f"Your sword beam deals {swordBeamDmg} damage to {objectWord} {targetWord}")
-                msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
+                if enemy.hp > 0:
+                    msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
+            if link.isEngaged(enemy):
+                msgLog(link.attack(enemy))
+                if enemy.hp > 0:
+                    msgLog(f"{objectWord} {targetWord} has {enemy.hp} health.")
+            else:
+                msgLog(f"You must be engaged with {objectWord} {targetWord} to hit it with your sword.")
         else:
-            if objectWord in ["old"] and currentTile.pos.x == 3 and currentTile.pos.y == 0 and currentTile.pos.z == 0:
+            if objectWord in ["old"] and currentTile.pos.z == 0:
                 msgLog("The flames beside the old man flare up and shoot fireballs at you!")
                 link.hp -= 1
                 msgLog(f"You lose 1 heart. You have {link.hp} hearts remaining.")
@@ -194,7 +225,18 @@ def parseInput(userInputz):
         else:
             item = objectWord
         if item in currentTile.items:
-            if item == "heart":
+            if item == "heart container":
+                link.maxhp += 1
+                link.hp += 1
+                msgLog(f"Heart container used. Your maximum hearts has been increased to {link.maxhp}. You currently have {link.hp} hearts.\nThe life potion disappeared.")
+                if "life potion" in currentTile.items:
+                    currentTile.items.remove("life potion")
+            elif item == "life potion":
+                link.hp = link.maxhp
+                msgLog(f"All hearts recovered. You currently have {link.hp} hearts.\nThe heart container disappeared.")
+                if "heart container" in currentTile.items:
+                    currentTile.items.remove("heart container")
+            elif item == "heart":
                 link.hp += 1
                 if link.hp > link.maxhp:
                     link.hp = link.maxhp
@@ -261,7 +303,7 @@ def parseInput(userInputz):
             msgLog(f"# {item} is not in your inventory. #")
     #status
     elif actionWord in ["status", "hp", "health", "rupies"]:
-        msgLog(f"You currently have {link.hp} hearts and {link.rupies} rupies.")
+        msgLog(f"You currently have {link.hp} hearts out of {link.maxhp} maximum hearts, and {link.rupies} rupies.")
     #look
     elif actionWord in ["look"]:
         msgLog(currentTile.intro_text())
@@ -360,10 +402,10 @@ def endGame():
     PlaySound(None, SND_FILENAME)
     PlaySound('audio/GameOver.wav', SND_FILENAME)
 
-def winGame():
+def winGame():#method called upon successful completion of game
     inputBox.delete(0, 'end')
     msgLog("")
-    msgLog(f"Thanks {link.name}, you're the hero of Hyrule.")
+    msgLog(f"Thanks '{link.name}', you're the hero of Hyrule.")
     msgLog(f"Finally peace returns to Hyrule.")
     msgLog(f"This ends the story.")
     msgLog(
@@ -405,7 +447,7 @@ def winGame():
 def initTile():
     msgLog(currentTile.intro_text())
     for enemy in currentTile.enemiez:
-        enemy.nextActionTime = currentTime + random.random()*enemy.actionSpeed
+        enemy.nextActionTime = currentTime + random.random()*enemy.actionSpeed + enemy.actionDelay
     return
 
 ## This loop is repeatedly called with tkinter libraries to allow game logic to occur ##
@@ -422,7 +464,7 @@ def gameloop():
             msgLog(f"{enemy.name} {enemy.num} is dead.")
             currentTile.enemiez.remove(enemy)
             drop = enemy.drops[random.randint(0, len(enemy.drops)-1)]
-            if drop:
+            if drop and random.random()<0.5:
                 currentTile.items.append(drop)
                 msgLog(f"{enemy.name} {enemy.num} dropped \"{drop}\".")
                 currentTile.items.sort()
@@ -430,14 +472,16 @@ def gameloop():
     if not isLinkDead:
         for enemy in currentTile.enemiez:
             if currentTime > enemy.nextActionTime:
-                msgLog(enemy.action(link))
+                strToLog = enemy.action(link)
+                if strToLog:
+                    msgLog(strToLog)
     
-    if currentTile.pos.x == 3 and currentTile.pos.y == 2 and currentTile.pos.z == 1 and not isGameWon:
+    if currentTile.pos.x == 2 and currentTile.pos.y == 3 and currentTile.pos.z == 1 and not isGameWon:
         isGameWon = True
         winGame()
     
     #check for player death
-    if link.hp <=0:
+    if link.hp <=0 and not isLinkDead:
         msgLog(f"{link.name} is dead.")
         isLinkDead = True
         endGame()
@@ -446,7 +490,7 @@ def gameloop():
         link.isDodging = False
     
     #change the music
-    if (currentTime > 6.798) and (not isIntroFinished):
+    if (currentTime > 6.798) and not isIntroFinished:
         isIntroFinished = True
         if not isLinkDead:
             PlaySound('audio/OverworldLoop.wav', SND_FILENAME|SND_ASYNC|SND_LOOP)
@@ -513,13 +557,17 @@ if __name__ == "__main__":
     input("< Press enter to continue >")
     #import map
     global map
-    map = tiles.getOverworldTiles()
+    map = tiles.getOverworldTiles(link)
     global currentTile
     currentTile = map[3][0][1]
     #set starting inventory
     link.inventory.append("wooden shield")
     #stop title screen music
     PlaySound(None, SND_FILENAME)
+    #start main game music
+    PlaySound('audio/Overworld.wav', SND_FILENAME|SND_ASYNC)
+    global isIntroFinished
+    isIntroFinished = False
     #specify window details
     root = tk.Tk()
     root.resizable(False, False)
@@ -554,10 +602,6 @@ if __name__ == "__main__":
     isLinkDead = False
     global isGameWon
     isGameWon = False
-    #start main game music
-    PlaySound('audio/Overworld.wav', SND_FILENAME|SND_ASYNC)
-    global isIntroFinished
-    isIntroFinished = False
     #log message for starting room
     msgLog(currentTile.intro_text())
     #start gameloop
