@@ -95,7 +95,7 @@ class Tektite(Enemy):
                 return f"Tektite {self.num} jumps around."
 
 
-class Leever(Enemy):#TODO
+class Leever(Enemy):
     def __init__(self, number):
         super().__init__(number, "Leever", 4, 4, 4)
         self.drops = ["rupy", "rupy", "rupy", "rupy", "rupy", "5 rupies", "5 rupies", "clock", "heart", "heart"]

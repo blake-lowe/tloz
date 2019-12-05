@@ -147,7 +147,7 @@ def getOverworldTiles(link):
         [],#objects
         "He gestures toward a heart container and a life potion, \"Take any one you want.\""
         )
-    #final fight room (leever)#TODO
+    #final fight room (leever)
     tileList[2][2][1] = MapTile(
         Point(2,2,1),#this tile position
         "The bridge connects to the island at a small sandy beach.",#tile description
